@@ -59,7 +59,10 @@ If you're not in a project in Rstudio, make sure to set your working directory h
 If you created an RStudio project, then your working directory (the directory with your data and code for these assignments) is the project directory.
 
 ```{r}
+
 pacman::p_load(tidyverse,janitor)
+setwd("~/Dropbox/MastersSem1/2020MethCP/git-assignments/methods3_A1")
+
 ```
 
 Load the three data sets, after downloading them from dropbox and saving them in your working directory:
@@ -68,6 +71,10 @@ Load the three data sets, after downloading them from dropbox and saving them in
 * Word data: https://www.dropbox.com/s/8ng1civpl2aux58/token_train.csv?dl=0
 
 ```{r}
+
+demo_train <- read_csv("demo_train.csv")
+LU_train <- read_csv("LU_train.csv")
+token_train <- read_csv("token_train.csv")
 
 ```
 
@@ -89,6 +96,19 @@ Tip: look through the chapter on data transformation in R for data science (http
 
 ```{r}
 
+## remembering tidyverse. 
+# filter, arrange, select, mutate, summarise, slice, group_by. 
+
+str(demo_train) #Child.ID, Visit. (makes sense to change this one).  
+str(LU_train) #SUBJ, VISIT. 
+str(token_train) #SUBJ, VISIT. 
+
+demo_train <- demo_train %>%
+  rename(SUBJ = Child.ID, 
+         VISIT = Visit)
+
+str(demo_train)
+
 ```
 
 2b. Find a way to homogeneize the way "visit" is reported (visit1 vs. 1).
@@ -98,10 +118,35 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 ```{r}
 
+#how are they represented. 
+str(demo_train$VISIT)
+str(LU_train$VISIT)
+str(token_train$VISIT)
+
+#we want "1, 2, 3, 4, 5, 6" but as_factor (I think). 
+
+#SOLUTION 1: 
+LU_train <- LU_train %>%
+  mutate_at("VISIT", str_extract, "\\d") %>% #(.tbl, .funs, ...) 
+  mutate(VISIT = as_factor(VISIT))
+
+token_train <- token_train %>%
+  mutate_at("VISIT", str_extract, "\\d") %>%
+  mutate(VISIT = as_factor(VISIT))
+
+demo_train <- demo_train %>%
+  mutate(VISIT = as_factor(VISIT))
+
+
+#solution 2 (one-liner)? 
+str(demo_train$VISIT)
+str(LU_train$VISIT)
+str(token_train$VISIT)
+
 
 ```
 
-2c. We also need to make a small adjustment to the content of the Child.ID coloumn in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
+2c. We also need to make a small adjustment to the content of the Child.ID column in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
 A neat way to solve the problem is simply to remove all "." in all datasets.
 
 Tip: stringr is helpful again. Look up str_replace_all
@@ -109,6 +154,8 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 
 ```{r}
+
+
 
 ```
 
