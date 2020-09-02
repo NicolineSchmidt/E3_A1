@@ -155,7 +155,27 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 ```{r}
 
+#Solution 1 (less typing): 
+#working on the "SUBJ"-column. 
 
+str(demo_train$SUBJ) #has dots.
+str(LU_train$SUBJ) #has dots. 
+str(token_train$SUBJ) #has dots. 
+
+demo_train <- demo_train %>%
+   mutate_at("SUBJ", str_replace_all, "[.]", "")
+
+LU_train <- LU_train %>%
+  mutate_at("SUBJ", str_replace_all, "[.]", "")
+
+token_train <- token_train %>%
+  mutate_at("SUBJ", str_replace_all, "[.]", "")
+
+str(demo_train$SUBJ)
+str(LU_train$SUBJ)
+str(token_train$SUBJ)
+
+#Solution 2 (more typing): 
 
 ```
 
@@ -193,6 +213,57 @@ Feel free to rename the variables into something you can remember (i.e. nonVerba
 
 ```{r}
 
+"
+* Child.ID, 
+* Visit, 
+* Diagnosis, 
+* Ethnicity, 
+* Gender, 
+* Age, 
+* ADOS,  
+* MullenRaw, 
+* ExpressiveLangRaw, 
+* Socialization
+* MOT_MLU, 
+* CHI_MLU, 
+* types_MOT, 
+* types_CHI, 
+* tokens_MOT, 
+* tokens_CHI.
+"
+
+# function: 
+selector <- function(df){
+  
+  df <- df %>%
+    select(SUBJ, VISIT, Diagnosis, Ethnicity,
+           Gender, Age, ADOS, MullenRaw, ExpressiveLangRaw,
+           Socialization, MOT_MLU, CHI_MLU, types_MOT,
+           types_CHI, tokens_MOT, tokens_CHI)
+
+}
+
+# fails with those that do not exist: 
+#selector(demo_train)
+#selector(LU_train)
+#selector(token_train)
+
+# function (second try): 
+selector2 <- function(df){
+  
+  df <- df %>%
+    select(one_of(c("SUBJ", "VISIT", "Diagnosis", "Ethnicity",
+           "Gender", "Age", "ADOS", "MullenRaw", "ExpressiveLangRaw",
+           "Socialization", "MOT_MLU", "CHI_MLU", "types_MOT",
+           "types_CHI", "tokens_MOT", "tokens_CHI")))
+
+}
+
+#this approach works. 
+demo_train <- selector2(demo_train)
+LU_train <- selector2(LU_train)
+token_train <- selector2(token_train)
+
 ```
 
 2e. Finally we are ready to merge all the data sets into just one. 
@@ -203,12 +274,20 @@ Some things to pay attention to:
 
 ```{r}
 
+#Solution 1: (pretty dumb, and gets us only 352 obs.)
+merged_data <- merge(demo_train, LU_train,
+                     by = c("SUBJ", "VISIT"))
+
+merged_data <- merge(merged_data, token_train, 
+                     by = c("SUBJ", "VISIT"))
+
+#Solution 2:
 
 ```
 
 
 2f. Only using clinical measures from Visit 1
-In order for our models to be useful, we want to miimize the need to actually test children as they develop. In other words, we would like to be able to understand and predict the children's linguistic development after only having tested them once. Therefore we need to make sure that our ADOS, MullenRaw, ExpressiveLangRaw and Socialization variables are reporting (for all visits) only the scores from visit 1.
+In order for our models to be useful, we want to minimize the need to actually test children as they develop. In other words, we would like to be able to understand and predict the children's linguistic development after only having tested them once. Therefore we need to make sure that our ADOS, MullenRaw, ExpressiveLangRaw and Socialization variables are reporting (for all visits) only the scores from visit 1.
 
 A possible way to do so:
 * create a new dataset with only visit 1, child id and the 4 relevant clinical variables to be merged with the old dataset
@@ -218,6 +297,16 @@ A possible way to do so:
 
 
 ```{r}
+
+#new_data; VISIT == 1, ID & 4 clinical variables. 
+new_data <- merged_data %>%
+  filter(VISIT == 1) %>%
+  select(SUBJ, ADOS, MullenRaw, 
+         ExpressiveLangRaw, Socialization)
+
+#renaming clinical variables (but in which data-frame?)
+
+#merge the data-sets. 
 
 ```
 
@@ -230,6 +319,12 @@ Now we want to
 
 ```{r}
 
+#anonymization. 
+
+#relabelling (gender, diagnosis): use ifelse() 
+
+#write.csv(), or perhaps write_csv()? 
+  
 ```
 
 
