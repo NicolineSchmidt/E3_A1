@@ -100,15 +100,20 @@ Tip: look through the chapter on data transformation in R for data science (http
 
 ```{r}
 
-#Getting an overview: compare_df_cols()
 compare_df_cols(demo_train, LU_train, token_train)
 
-demo_train <- demo_train %>%
-  rename(SUBJ = Child.ID, 
-         VISIT = Visit)
+#demo_train: Visit, Child.ID 
+#LU_train: VISIT, SUBJ
+#token_train: VISIT, SUBJ
 
-str(demo_train)
+#changing the two that are alike and merging. 
+speech <- merge(LU_train, token_train, all = T) %>%
+  rename(Visit = VISIT, Child.ID = SUBJ)
 
+#not needed anymore.
+rm(LU_train, token_train)
+
+## same here. 
 ```
 
 2b. Find a way to homogeneize the way "visit" is reported (visit1 vs. 1).
@@ -118,41 +123,17 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 ```{r}
 
-#how are they represented. 
-compare_df_cols(demo_train, LU_train, token_train)
+compare_df_cols(speech, demo_train)
+head(demo_train$Visit)
+head(speech$Visit)
 
-#SOLUTION 1: 
-LU_train <- LU_train %>%
-  mutate_at("VISIT", str_extract, "\\d") %>% #(.tbl, .funs, ...) 
-  mutate(VISIT = as.integer(VISIT)) #or as_factor()
+speech <- speech %>%
+  mutate_at("Visit", str_extract, "\\d") %>%
+  mutate(Visit = as.integer(Visit))
 
-token_train <- token_train %>%
-  mutate_at("VISIT", str_extract, "\\d") %>%
-  mutate(VISIT = as.integer(VISIT))
+head(speech$Visit)
 
-demo_train <- demo_train %>%
-  mutate(VISIT = as.integer(VISIT))
-
-
-#solution 2 (function):
-#define function. 
-extractor <- function(df){
-  
-df <- df %>%
-  mutate_at("VISIT", str_extract, "\\d") %>%
-  mutate(VISIT = as.integer(VISIT))
-  
-}
-
-#use function. 
-demo_train <- extractor(demo_train)
-LU_train <- extractor(LU_train)
-token_train <- extractor(token_train)
-
-#check same type. 
-compare_df_cols(demo_train, LU_train, token_train)
-
-
+## same here. 
 ```
 
 2c. We also need to make a small adjustment to the content of the Child.ID column in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
@@ -164,40 +145,20 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 ```{r}
 
-#Solution 1 (less typing): 
-#working on the "SUBJ"-column. 
-str(demo_train$SUBJ) #has dots.
-str(LU_train$SUBJ) #has dots. 
-str(token_train$SUBJ) #has dots. 
-
-demo_train <- demo_train %>%
-   mutate_at("SUBJ", str_replace_all, "\\.", "")
-
-LU_train <- LU_train %>%
-  mutate_at("SUBJ", str_replace_all, "\\.", "")
-
-token_train <- token_train %>%
-  mutate_at("SUBJ", str_replace_all, "[.]", "") #the same. 
-
-str(demo_train$SUBJ)
-str(LU_train$SUBJ)
-str(token_train$SUBJ)
-
-#Solution 2 (function): 
-stringer <- function(df){
+#define function: 
+remover <- function(df){
   
 df <- df %>%
-  mutate_at("SUBJ", str_replace_all, "\\.", "") # "\\." because "\" escapes. 
-  
+  mutate_at("Child.ID", str_replace_all, "\\.", "")
 }
 
-#using the function: 
-demo_train <- stringer(demo_train)
-LU_train <- stringer(LU_train)
-token_train <- stringer(token_train)
+demo_train <- remover(demo_train)
+speech <- remover(speech)
 
-#Solution 3 (one_liner), but I like this less: 
-demo_train$SUBJ <-  str_replace_all(demo_train$SUBJ,"\\.", "")
+str(demo_train$Child.ID)
+str(speech$Child.ID)
+
+## same here. 
 
 ```
 
@@ -254,41 +215,31 @@ Feel free to rename the variables into something you can remember (i.e. nonVerba
 * tokens_CHI.
 "
 
-# function: 
 selector <- function(df){
-  
-  df <- df %>%
-    select(SUBJ, VISIT, Diagnosis, Ethnicity,
-           Gender, Age, ADOS, MullenRaw, ExpressiveLangRaw,
-           Socialization, MOT_MLU, CHI_MLU, types_MOT,
-           types_CHI, tokens_MOT, tokens_CHI)
 
+df <- df %>% 
+  dplyr::select(one_of("Child.ID", 
+                "Visit", 
+                "Diagnosis", 
+                "Ethnicity", 
+                "Gender", 
+                "Age", 
+                "ADOS",  
+                "MullenRaw", 
+                "ExpressiveLangRaw", 
+                "Socialization",
+                "MOT_MLU", 
+                "CHI_MLU", 
+                "types_MOT", 
+                "types_CHI", 
+                "tokens_MOT", 
+                "tokens_CHI"))
 }
 
-# fails with those that do not exist: 
-#selector(demo_train)
-#selector(LU_train)
-#selector(token_train)
+demo_selected <- selector(demo_train)
+speech_selected <- selector(speech)
 
-# function (second try): 
-selector2 <- function(df){
-  
-  df <- df %>%
-    select(one_of(c("SUBJ", "VISIT", "Diagnosis", "Ethnicity",
-           "Gender", "Age", "ADOS", "MullenRaw", "ExpressiveLangRaw",
-           "Socialization", "MOT_MLU", "CHI_MLU", "types_MOT",
-           "types_CHI", "tokens_MOT", "tokens_CHI"))) #one_of!! 
-
-}
-
-#this approach works. 
-demo_train <- selector2(demo_train)
-LU_train <- selector2(LU_train)
-token_train <- selector2(token_train)
-
-#another approach is simply to select(c(....)) at manually select 
-#all the appropriate columns (that are in the data-sets). 
-
+## Still the same. 
 ```
 
 2e. Finally we are ready to merge all the data sets into just one. 
@@ -299,11 +250,8 @@ Some things to pay attention to:
 
 ```{r}
 
-#Solution 1: (pretty dumb, does the job (giving us 372 obs). 
-merged_data <- merge(demo_train, LU_train, all = T) #all rows returned. 
-merged_data <- merge(merged_data, token_train, all = T) 
-
-#Solution 2: (pipe?)
+#now it works (probably the as.integer stuff.)
+data_merged <- merge(demo_selected, speech_selected, all = T)
 
 ```
 
@@ -320,17 +268,6 @@ A possible way to do so:
 
 ```{r}
 
-#new_data; VISIT == 1, ID & 4 clinical variables. 
-new_data <- merged_data %>%
-  filter(VISIT == 1) %>%
-  select(SUBJ,
-         ADOS1 = ADOS, #new_name = old_name. 
-         verbalIQ1 = ExpressiveLangRaw,
-         nonVerbalIQ1 = MullenRaw,
-         Socialization1 = Socialization)
-  
-data <- merge(new_data, merged_data, all = T)
-
 ```
 
 2g. Final touches
@@ -342,29 +279,7 @@ Now we want to
 
 ```{r}
 
-#anonymization. 
-str(data$SUBJ)
-str(data$VISIT)
 
-data <- data %>%
-  mutate(SUBJ = as.numeric(as_factor(SUBJ))) %>%
-  mutate(VISIT = as.numeric(VISIT))
-
-#relabelling (gender, diagnosis): use ifelse() 
-#Approach 1 (tidyverse, not ifelse). 
-data <- data %>%
-  mutate(Gender = recode(Gender,
-    "1" = "F", #not clear whether this or opposite. 
-    "2" = "M" #the text and Ricco's code disagrees. 
-  ),
-  Diagnosis = recode(Diagnosis,
-    "A" = "ASD",
-    "B" = "TD"
-  ))
-
-#Approach 2 (ifelse). Pretty sure this works (& it is better).
-data_test <- data %>%
-  mutate(Gender = if_else(Gender == "F", "1", "2"))
 
 #remove everything but "data" from working environment. 
 rm(list=setdiff(ls(), "data")) 

@@ -1,8 +1,10 @@
 ---
-title: "Assignment 1 - Solution"
-author: "Riccardo Fusaroli"
-date: "08/08/2019"
-output: html_document
+title: "Assignment 1 - Data Cleaning - Instructions"
+author: "Victor M. Poulsen"
+date: "03-08-2020"
+output: 
+  html_document:
+    keep_md: true 
 ---
 
 # Assignment 1, Language development in Autism Spectrum Disorder (ASD) - Brushing up your code skills
@@ -15,6 +17,13 @@ In this warm-up assignment you will:
 3) Warm up your tidyverse skills (especially the sub-packages stringr and dplyr), which you will find handy for later assignments.
 
 
+## Learning objectives:
+
+- Become comfortable with tidyverse (and R in general)
+- Test out the git integration with RStudio
+- Build expertise in data wrangling (which will be used in future assignments)
+
+
 ## 0. First an introduction on the data
 
 # Language development in Autism Spectrum Disorder (ASD)
@@ -24,7 +33,7 @@ Reference to the study: https://www.ncbi.nlm.nih.gov/pubmed/30396129
 Background: Autism Spectrum Disorder (ASD) is often related to language impairment, and language impairment strongly affects the patients ability to function socially (maintaining a social network, thriving at work, etc.). It is therefore crucial to understand how language abilities develop in children with ASD, and which factors affect them (to figure out e.g. how a child will develop in the future and whether there is a need for language therapy).
 However, language impairment is always quantified by relying on the parent, teacher or clinician subjective judgment of the child, and measured very sparcely (e.g. at 3 years of age and again at 6). 
 
-In this study we videotaped circa 30 kids with ASD and circa 30 comparison kids (matched by linguistic performance at visit 1) for ca. 30 minutes of naturalistic interactions with a parent. We repeated the data collection 6 times per kid, with 4 months between each visit. We transcribed the data and counted: 
+In this study the researchers videotaped circa 30 kids with ASD and circa 30 comparison kids (matched by linguistic performance at visit 1) for ca. 30 minutes of naturalistic interactions with a parent. They repeated the data collection 6 times per kid, with 4 months between each visit. Then the researchers transcribed the data and counted: 
 i) the amount of words that each kid uses in each video. Same for the parent.
 ii) the amount of unique words that each kid uses in each video. Same for the parent.
 iii) the amount of morphemes per utterance (Mean Length of Utterance) displayed by each child in each video. Same for the parent. 
@@ -32,7 +41,7 @@ iii) the amount of morphemes per utterance (Mean Length of Utterance) displayed 
 Different researchers involved in the project provide you with different datasets: 
 1) demographic and clinical data about the children (recorded by a clinical psychologist)
 2) length of utterance data (calculated by a linguist)
-3) amount of unique and total words used (calculated by a fumbling jack-of-all-trade, let's call him RF)
+3) amount of unique and total words used (calculated by a jack-of-all-trade, let's call him RF)
 
 Your job in this assignment is to double check the data and make sure that it is ready for the analysis proper (Assignment 2), in which we will try to understand how the children's language develops as they grow as a function of cognitive and social factors and which are the "cues" suggesting a likely future language impairment.
 
@@ -43,8 +52,7 @@ In the assignments you will be asked to upload your code on Github and the GitHu
 Follow the link to one of the tutorials indicated in the syllabus: 
 * Recommended: https://happygitwithr.com/
 *	Alternative (if the previous doesn't work): https://support.rstudio.com/hc/en-us/articles/200532077-Version-Control-with-Git-and-SVN
-*	Alternative (if the previous doesn't work): https://docs.google.com/document/d/1WvApy4ayQcZaLRpD6bvAqhWncUaPmmRimT016-PrLBk/mobilebasic
-
+*	Alternative (if the previous doesn't work): R.version.string
 N.B. Create a GitHub repository for the Assignment 1 and link it to a project on your RStudio.
 
 ## 2. Now let's take dirty dirty data sets and make them into a tidy one
@@ -53,19 +61,25 @@ If you're not in a project in Rstudio, make sure to set your working directory h
 If you created an RStudio project, then your working directory (the directory with your data and code for these assignments) is the project directory.
 
 ```{r}
+
+# git remote set-url origin https://github.com/victor-m-p/project
+
 pacman::p_load(tidyverse,janitor)
+setwd("~/Dropbox/MastersSem1/2020MethCP/git-assignments/methods3_A1")
+
 ```
 
 Load the three data sets, after downloading them from dropbox and saving them in your working directory:
-* Demographic data for the participants: https://www.dropbox.com/s/w15pou9wstgc8fe/demo_train.csv?dl=0
+* Demographic data for the participants: https://www.dropbox.com/s/lol8f5m4pgrpmto/demo_train.csv?dl=0
 * Length of utterance data: https://www.dropbox.com/s/usyauqm37a76of6/LU_train.csv?dl=0
 * Word data: https://www.dropbox.com/s/8ng1civpl2aux58/token_train.csv?dl=0
 
 ```{r}
-Demo <- read_csv("demo_train.csv")
-getwd()
-LU <- read_csv('LU_train.csv')
-Word <- read_csv('token_train.csv')
+
+demo_train <- read_csv("demo_train.csv") #read_csv() faster than read.csv()
+LU_train <- read_csv("LU_train.csv")
+token_train <- read_csv("token_train.csv")
+
 ```
 
 Explore the 3 datasets (e.g. visualize them, summarize them, etc.). You will see that the data is messy, since the psychologist collected the demographic data, the linguist analyzed the length of utterance in May 2014 and the fumbling jack-of-all-trades analyzed the words several months later. 
@@ -85,12 +99,15 @@ Tip: look through the chapter on data transformation in R for data science (http
 
 
 ```{r}
-compare_df_cols(LU,Word,Demo)
 
-Speech <- merge(LU, Word) %>% 
-  rename(Child.ID = SUBJ, Visit=VISIT)
+#Getting an overview: compare_df_cols()
+compare_df_cols(demo_train, LU_train, token_train)
 
-compare_df_cols(Speech,Demo)
+demo_train <- demo_train %>%
+  rename(SUBJ = Child.ID, 
+         VISIT = Visit)
+
+str(demo_train)
 
 ```
 
@@ -100,10 +117,45 @@ Tip: The stringr package is what you need. str_extract () will allow you to extr
 
 
 ```{r}
-Speech$Visit=as.integer(str_extract(Speech$Visit, "\\d"))
+
+#how are they represented. 
+compare_df_cols(demo_train, LU_train, token_train)
+
+#SOLUTION 1: 
+LU_train <- LU_train %>%
+  mutate_at("VISIT", str_extract, "\\d") %>% #(.tbl, .funs, ...) 
+  mutate(VISIT = as.integer(VISIT)) #or as_factor()
+
+token_train <- token_train %>%
+  mutate_at("VISIT", str_extract, "\\d") %>%
+  mutate(VISIT = as.integer(VISIT))
+
+demo_train <- demo_train %>%
+  mutate(VISIT = as.integer(VISIT))
+
+
+#solution 2 (function):
+#define function. 
+extractor <- function(df){
+  
+df <- df %>%
+  mutate_at("VISIT", str_extract, "\\d") %>%
+  mutate(VISIT = as.integer(VISIT))
+  
+}
+
+#use function. 
+demo_train <- extractor(demo_train)
+LU_train <- extractor(LU_train)
+token_train <- extractor(token_train)
+
+#check same type. 
+compare_df_cols(demo_train, LU_train, token_train)
+
+
 ```
 
-2c. We also need to make a small adjustment to the content of the Child.ID coloumn in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
+2c. We also need to make a small adjustment to the content of the Child.ID column in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
 A neat way to solve the problem is simply to remove all "." in all datasets.
 
 Tip: stringr is helpful again. Look up str_replace_all
@@ -111,15 +163,45 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 
 ```{r}
-### one-liner
-Speech$Child.ID <-  str_replace_all(Speech$Child.ID,"\\.", "")
 
-Demo$Child.ID <-  str_replace_all(Demo$Child.ID,"\\.", "")
+#Solution 1 (less typing): 
+#working on the "SUBJ"-column. 
+str(demo_train$SUBJ) #has dots.
+str(LU_train$SUBJ) #has dots. 
+str(token_train$SUBJ) #has dots. 
 
+demo_train <- demo_train %>%
+   mutate_at("SUBJ", str_replace_all, "\\.", "")
+
+LU_train <- LU_train %>%
+  mutate_at("SUBJ", str_replace_all, "\\.", "")
+
+token_train <- token_train %>%
+  mutate_at("SUBJ", str_replace_all, "[.]", "") #the same. 
+
+str(demo_train$SUBJ)
+str(LU_train$SUBJ)
+str(token_train$SUBJ)
+
+#Solution 2 (function): 
+stringer <- function(df){
+  
+df <- df %>%
+  mutate_at("SUBJ", str_replace_all, "\\.", "") # "\\." because "\" escapes. 
+  
+}
+
+#using the function: 
+demo_train <- stringer(demo_train)
+LU_train <- stringer(LU_train)
+token_train <- stringer(token_train)
+
+#Solution 3 (one_liner), but I like this less: 
+demo_train$SUBJ <-  str_replace_all(demo_train$SUBJ,"\\.", "")
 
 ```
 
-2d. Now that the nitty gritty details of the different data sets are fixed, we want to make a subset of each data set only containing the variables that we wish to use in the final data set.
+2d. Now that the nitty gritty details of the different data sets are fixed, we want to make a subset of each data set only containig the variables that we wish to use in the final data set.
 For this we use the tidyverse package dplyr, which contains the function select(). 
 
 The variables we need are: 
@@ -142,7 +224,7 @@ The variables we need are:
 
 Most variables should make sense, here the less intuitive ones. 
 * ADOS (Autism Diagnostic Observation Schedule) indicates the severity of the autistic symptoms (the higher the score, the worse the symptoms). Ref: https://link.springer.com/article/10.1023/A:1005592401947
-* MLU stands for mean length of utterance
+* MLU stands for mean length of utterance (usually a proxy for syntactic complexity)
 * types stands for unique words (e.g. even if "doggie" is used 100 times it only counts for 1)
 * tokens stands for overall amount of words (if "doggie" is used 100 times it counts for 100) 
 * MullenRaw indicates non verbal IQ, as measured by Mullen Scales of Early Learning (MSEL https://link.springer.com/referenceworkentry/10.1007%2F978-1-4419-1698-3_596)
@@ -153,10 +235,60 @@ Feel free to rename the variables into something you can remember (i.e. nonVerba
 
 ```{r}
 
-Demo <- Demo %>% 
-  select(c("Child.ID", "Visit", "Ethnicity", "Diagnosis", "Gender", "Age", "ADOS", "MullenRaw", "ExpressiveLangRaw","Socialization"))
-Speech <- Speech %>% 
-  select(c("Child.ID", "Visit", "MOT_MLU", "CHI_MLU", "types_MOT", "types_CHI", "tokens_MOT", "tokens_CHI"))
+"
+* Child.ID, 
+* Visit, 
+* Diagnosis, 
+* Ethnicity, 
+* Gender, 
+* Age, 
+* ADOS,  
+* MullenRaw, 
+* ExpressiveLangRaw, 
+* Socialization
+* MOT_MLU, 
+* CHI_MLU, 
+* types_MOT, 
+* types_CHI, 
+* tokens_MOT, 
+* tokens_CHI.
+"
+
+# function: 
+selector <- function(df){
+  
+  df <- df %>%
+    select(SUBJ, VISIT, Diagnosis, Ethnicity,
+           Gender, Age, ADOS, MullenRaw, ExpressiveLangRaw,
+           Socialization, MOT_MLU, CHI_MLU, types_MOT,
+           types_CHI, tokens_MOT, tokens_CHI)
+
+}
+
+# fails with those that do not exist: 
+#selector(demo_train)
+#selector(LU_train)
+#selector(token_train)
+
+# function (second try): 
+selector2 <- function(df){
+  
+  df <- df %>%
+    select(one_of(c("SUBJ", "VISIT", "Diagnosis", "Ethnicity",
+           "Gender", "Age", "ADOS", "MullenRaw", "ExpressiveLangRaw",
+           "Socialization", "MOT_MLU", "CHI_MLU", "types_MOT",
+           "types_CHI", "tokens_MOT", "tokens_CHI"))) #one_of!! 
+
+}
+
+#this approach works. 
+demo_train <- selector2(demo_train)
+LU_train <- selector2(LU_train)
+token_train <- selector2(token_train)
+
+#another approach is simply to select(c(....)) at manually select 
+#all the appropriate columns (that are in the data-sets). 
+
 ```
 
 2e. Finally we are ready to merge all the data sets into just one. 
@@ -166,7 +298,12 @@ Some things to pay attention to:
 * make sure to understand whether (and if so why) there are NAs in the dataset (e.g. some measures were not taken at all visits, some recordings were lost or permission to use was withdrawn)
 
 ```{r}
-Data=merge(Demo,Speech,all=T)
+
+#Solution 1: (pretty dumb, does the job (giving us 372 obs). 
+merged_data <- merge(demo_train, LU_train, all = T) #all rows returned. 
+merged_data <- merge(merged_data, token_train, all = T) 
+
+#Solution 2: (pipe?)
 
 ```
 
@@ -182,15 +319,18 @@ A possible way to do so:
 
 
 ```{r}
-Data1 <- Data %>% 
-  subset(Visit==1) %>% 
-  select(Child.ID,
-         ADOS1 = ADOS,
+
+#new_data; VISIT == 1, ID & 4 clinical variables. 
+new_data <- merged_data %>%
+  filter(VISIT == 1) %>%
+  select(SUBJ,
+         ADOS1 = ADOS, #new_name = old_name. 
          verbalIQ1 = ExpressiveLangRaw,
          nonVerbalIQ1 = MullenRaw,
          Socialization1 = Socialization)
   
-Data <- merge(Data,Data1, all=T)
+data <- merge(new_data, merged_data, all = T)
+
 ```
 
 2g. Final touches
@@ -201,18 +341,40 @@ Now we want to
 * Save the data set using into a csv file. Hint: look into write.csv()
 
 ```{r}
-Data$Child.ID=as.numeric(as.factor(as.character(Data$Child.ID)))
-Data$Visit=as.numeric(as.character(Data$Visit))
 
-Data = Data %>% mutate(
-  Gender = recode(Gender, 
-     "1" = "M", #is not what he writes. 
-     "2" = "F"),
+#anonymization. 
+str(data$SUBJ)
+str(data$VISIT)
+
+data <- data %>%
+  mutate(SUBJ = as.numeric(as_factor(SUBJ))) %>%
+  mutate(VISIT = as.numeric(VISIT))
+
+#relabelling (gender, diagnosis): use ifelse() 
+#Approach 1 (tidyverse, not ifelse). 
+data <- data %>%
+  mutate(Gender = recode(Gender,
+    "1" = "F", #not clear whether this or opposite. 
+    "2" = "M" #the text and Ricco's code disagrees. 
+  ),
   Diagnosis = recode(Diagnosis,
-     "A"  = "ASD",
-     "B"  = "TD"))
+    "A" = "ASD",
+    "B" = "TD"
+  ))
 
-write_csv(Data, "cleaned_data.csv")
+#Approach 2 (ifelse). Pretty sure this works (& it is better).
+data_test <- data %>%
+  mutate(Gender = if_else(Gender == "F", "1", "2"))
+
+#remove everything but "data" from working environment. 
+rm(list=setdiff(ls(), "data")) 
+
+#write.csv(), or perhaps write_csv()? 
+write_csv(data, "data_cleaned_draft.csv") #check that this matches. 
+
+#read it to check. 
+test <- read_csv("data_cleaned_draft.csv")
+
 ```
 
 
@@ -228,8 +390,27 @@ List all kids who:
 3. have not completed all trials. Tip: Use pipes to solve this
 
 ```{r}
-Data %>% filter(CHI_MLU > 2.7)
-Data %>% filter(CHI_MLU > 1.5 & Visit == 1) #does this work?
+
+# MLU > 2.7 across visits. 
+data %>%
+  group_by(SUBJ) %>%
+  summarise(MEAN_CHI_MLU = mean(CHI_MLU)) %>%
+  filter(MEAN_CHI_MLU > 2.7) %>%
+  slice_head(n = 10)
+
+# MLU < 1.5 at first visit. 
+data %>% filter(VISIT == 1) %>%
+  filter(CHI_MLU < 1.5) %>%
+  select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
+  slice_head(n = 10)
+
+# Have not completed all trials (could be error prone).
+data %>%
+  group_by(SUBJ) %>%
+  summarize(MAX_VISIT = max(VISIT)) %>%
+  filter(MAX_VISIT < 6) %>%
+  slice_head(n = 10)
+  
 ```
 
 
@@ -239,33 +420,62 @@ USING ARRANGE
 2. Sort kids to find the kid who produced the least amount of words on the 1st visit.
 
 ```{r}
-Data %>% filter(Visit == 6) %>%
-  arrange(desc(tokens_CHI))
 
-Data %>% filter(Visit == 1) %>%
-  arrange(tokens_CHI)
+data %>% filter(VISIT == 6) %>%
+  arrange(desc(CHI_MLU)) %>%
+  select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
+  slice_head(n = 10)
 
+data %>% filter(VISIT == 1) %>%
+  arrange(CHI_MLU) %>%
+  select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
+  slice_head(n = 10)
+  
 ```
 
 USING SELECT
+
+### Again some unclear writing ### 
 
 1. Make a subset of the data including only kids with ASD, mlu and word tokens
 2. What happens if you include the name of a variable multiple times in a select() call?
 
 ```{r}
-Data %>% filter(Diagnosis == "ASD") %>%
+
+# 1. subset ASD, MLU, Tokens. 
+data %>% filter(Diagnosis == "ASD") %>%
+  select(Diagnosis, CHI_MLU, tokens_CHI) %>%
+  arrange(desc(CHI_MLU)) %>%
+  slice_head(n = 10)
+
+
+# 2. multiple variable multiple times. (nothing).
+test <- data %>% filter(Diagnosis == "ASD") %>%
   select(Diagnosis, CHI_MLU, tokens_CHI)
-Data %>% filter(Diagnosis == "ASD") %>%
-  select(Diagnosis, CHI_MLU, CHI_MLU, tokens_CHI)
+
+test2 <- data %>% filter(Diagnosis == "ASD") %>%
+  select(Diagnosis, CHI_MLU, tokens_CHI, tokens_CHI)
+
+all.equal(test, test2)
+
 ```
 
+### Some confusion here in word-usage, not clear what is meant ###
 
 USING MUTATE, SUMMARISE and PIPES
-1. Add a column to the data set that represents the mean number of words spoken during all visits.
+1. Add a column to the data set that represents the mean number of words spoken during all visits. ## per child?
 2. Use the summarise function and pipes to add an column in the data set containing the mean amount of words produced by each trial across all visits. HINT: group by Child.ID 
 3. The solution to task above enables us to assess the average amount of words produced by each child. Why don't we just use these average values to describe the language production of the children? What is the advantage of keeping all the data?
 
 ```{r}
 
-
+# mutate w. group_by. 
+data %>%
+  group_by(SUBJ) %>%
+  mutate(mean_CHI_MLU = mean(CHI_MLU)) %>%
+  select(SUBJ, VISIT, CHI_MLU, mean_CHI_MLU) %>%
+  slice_head(n = 15)
+  
+# is the second question not pretty much the same?
+  
 ```
