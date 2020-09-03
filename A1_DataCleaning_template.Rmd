@@ -2,8 +2,9 @@
 title: "Assignment 1 - Data Cleaning - Instructions"
 author: "Victor M. Poulsen"
 date: "03-08-2020"
-output: html_document:
-  keep_md: true #keeps the markdown, which is nice. 
+output: 
+  html_document:
+    keep_md: true 
 ---
 
 # Assignment 1, Language development in Autism Spectrum Disorder (ASD) - Brushing up your code skills
@@ -61,6 +62,8 @@ If you created an RStudio project, then your working directory (the directory wi
 
 ```{r}
 
+# git remote set-url origin https://github.com/victor-m-p/project
+
 pacman::p_load(tidyverse,janitor)
 setwd("~/Dropbox/MastersSem1/2020MethCP/git-assignments/methods3_A1")
 
@@ -98,9 +101,7 @@ Tip: look through the chapter on data transformation in R for data science (http
 ```{r}
 
 #Getting an overview: compare_df_cols()
-str(demo_train) #Child.ID, Visit. (makes sense to change this one).  
-str(LU_train) #SUBJ, VISIT. 
-str(token_train) #SUBJ, VISIT. 
+compare_df_cols(demo_train, LU_train, token_train)
 
 demo_train <- demo_train %>%
   rename(SUBJ = Child.ID, 
