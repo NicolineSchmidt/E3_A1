@@ -20,18 +20,18 @@ to get everyone on the right track. So, what we will cover:
 3. **pipes** 
 4. **functions**
 
-```{r, warnings = FALSE}
 
+```r
 pacman::p_load(tidyverse,janitor)
 setwd("~/Dropbox/MastersSem1/2020MethCP/git-assignments/methods3_A1")
-
 ```
 
 ### Loading data
 We want to use **read_csv()** instead of **read.csv()** 
 since it is faster (something like 10x).
 
-```{r, warnings=FALSE}
+
+```r
 #suppress messages: 
 options(readr.num_columns = 0)
 
@@ -39,7 +39,6 @@ options(readr.num_columns = 0)
 demo_train <- read_csv("demo_train.csv") 
 LU_train <- read_csv("LU_train.csv")
 token_train <- read_csv("token_train.csv")
-
 ```
 
 2a. Identify which variable names do not match (that is are spelled differently) and find a way to transform variable names.
@@ -57,17 +56,28 @@ Pay particular attention to the variables indicating participant and visit.
 2. Make your code **readable** (for you and for me). No long lines. 
 3. A lot of you already did this which is great!
 
-```{r, warnings = FALSE}
 
+```r
 #Getting an overview (from the janitor package)
 compare_df_cols(demo_train, LU_train, token_train) %>%
   head()
+```
 
+```
+##   column_name demo_train LU_train token_train
+## 1        ADOS    numeric     <NA>        <NA>
+## 2         Age    numeric     <NA>        <NA>
+## 3        Age2    numeric     <NA>        <NA>
+## 4   ASD_check    numeric     <NA>        <NA>
+## 5        ASD2    numeric     <NA>        <NA>
+## 6   Birthdate  character     <NA>        <NA>
+```
+
+```r
 #A readable and tidyverse solution. 
 demo_train <- demo_train %>%
   rename(SUBJ = Child.ID, 
          VISIT = Visit)
-
 ```
 
 2b. Find a way to homogeneize the way "visit" is reported (visit1 vs. 1).
@@ -87,8 +97,8 @@ For this task, note that we are running the
 exact same code on multiple dataframes (or tibbles).
 This indicates that a **function** would be useful.
 
-```{r, warnings = FALSE}
 
+```r
 #example solution 1 (some of you did it smarter):
 
 LU_train <- LU_train %>%
@@ -121,7 +131,16 @@ token_train <- extractor(token_train)
 #Check that we have the same type: 
 compare_df_cols(demo_train, LU_train, token_train) %>%
   tail()
+```
 
+```
+##              column_name demo_train LU_train token_train
+## 47    VinelandExpressive    numeric     <NA>        <NA>
+## 48     VinelandReceptive    numeric     <NA>        <NA>
+## 49 VinelandStandardScore    numeric     <NA>        <NA>
+## 50       VinelandWritten    numeric     <NA>        <NA>
+## 51                 VISIT    integer  integer     integer
+## 52                     X       <NA>     <NA>     logical
 ```
 
 2c. We also need to make a small adjustment to the content of the Child.ID column in the demographic data. Within this column, names that are not abbreviations do not end with "." (i.e. Adam), which is the case in the other two data sets (i.e. Adam.). If The content of the two variables isn't identical the rows will not be merged.
@@ -132,8 +151,8 @@ Tip: You can either have one line of code for each child name that is to be chan
 
 ### 2c. Exactly the same points as in 2b
 
-```{r, warnings = FALSE}
 
+```r
 #example solution 1:
 
 demo_train <- demo_train %>%
@@ -157,7 +176,6 @@ df <- df %>%
 demo_train <- stringer(demo_train)
 LU_train <- stringer(LU_train)
 token_train <- stringer(token_train)
-
 ```
 
 2d. Now that the nitty gritty details of the different data sets are fixed, we want to make a subset of each data set only containig the variables that we wish to use in the final data set.
@@ -168,8 +186,8 @@ For this we use the tidyverse package dplyr, which contains the function select(
 Again a **function** proves handy,
 although many of you also have good solutions. 
 
-```{r, warnings = FALSE}
 
+```r
 # example solution: 
 selector2 <- function(df){
   
@@ -183,9 +201,30 @@ selector2 <- function(df){
 
 # run the function: 
 demo_train <- selector2(demo_train)
-LU_train <- selector2(LU_train)
-token_train <- selector2(token_train)
+```
 
+```
+## Warning: Unknown columns: `MOT_MLU`, `CHI_MLU`, `types_MOT`, `types_CHI`,
+## `tokens_MOT`, `tokens_CHI`
+```
+
+```r
+LU_train <- selector2(LU_train)
+```
+
+```
+## Warning: Unknown columns: `Diagnosis`, `Ethnicity`, `Gender`, `Age`, `ADOS`,
+## `MullenRaw`, `ExpressiveLangRaw`, `Socialization`, `types_MOT`, `types_CHI`,
+## `tokens_MOT`, `tokens_CHI`
+```
+
+```r
+token_train <- selector2(token_train)
+```
+
+```
+## Warning: Unknown columns: `Diagnosis`, `Ethnicity`, `Gender`, `Age`, `ADOS`,
+## `MullenRaw`, `ExpressiveLangRaw`, `Socialization`, `MOT_MLU`, `CHI_MLU`
 ```
 
 2e. Finally we are ready to merge all the data sets into just one. 
@@ -199,12 +238,11 @@ Some things to pay attention to:
 Note: I think you need the **all = T** argument to keep 372 obs (which 
 we have in *demo_train* but not in *LU_train* and *token_train*). 
 
-```{r, warnings = FALSE}
 
+```r
 #Example solution 1 (although there should be something better): 
 merged_data <- merge(demo_train, LU_train, all = T)
 merged_data <- merge(merged_data, token_train, all = T) 
-
 ```
 
 
@@ -222,8 +260,8 @@ A possible way to do so:
 You can **filter**, **select** (and **rename**) in one pipeline. \ 
 2. Some misunderstanding of the task (which I totally get). 
 
-```{r, warnings = FALSE}
 
+```r
 # example solution: 
 new_data <- merged_data %>%
   filter(VISIT == 1) %>%
@@ -234,7 +272,6 @@ new_data <- merged_data %>%
          Socialization1 = Socialization)
   
 data <- merge(new_data, merged_data, all = T)
-
 ```
 
 2g. Final touches
@@ -250,8 +287,8 @@ Again we want to use **pipes** and **Tidyverse**. \
 We also want to use **write_csv()** and not **write.csv()**. \
 In addition, remember to call your file **.csv**. 
 
-```{r, warnings = FALSE}
 
+```r
 #example solution 1:
 data <- data %>%
   mutate(SUBJ = as.numeric(as_factor(SUBJ))) %>%
@@ -275,7 +312,6 @@ write_csv(data, "data_cleaned_draft.csv") #check that this matches.
 
 #read it to check. 
 test <- read_csv("data_cleaned_draft.csv")
-
 ```
 
 
@@ -290,28 +326,80 @@ List all kids who:
 2. have a mean length of utterance of less than 1.5 morphemes at the first visit
 3. have not completed all trials. Tip: Use pipes to solve this
 
-```{r}
 
+```r
 # MLU > 2.7 across visits. 
 data %>%
   group_by(SUBJ) %>%
   summarise(MEAN_CHI_MLU = mean(CHI_MLU)) %>%
   filter(MEAN_CHI_MLU > 2.7) %>%
   slice_head(n = 10)
+```
 
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 9 x 2
+##    SUBJ MEAN_CHI_MLU
+##   <dbl>        <dbl>
+## 1     4         3.02
+## 2     5         3.13
+## 3    14         2.75
+## 4    20         2.84
+## 5    28         2.73
+## 6    45         2.75
+## 7    54         2.94
+## 8    58         3.16
+## 9    65         3.26
+```
+
+```r
 # MLU < 1.5 at first visit. 
 data %>% filter(VISIT == 1) %>%
   filter(CHI_MLU < 1.5) %>%
   select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
   slice_head(n = 10)
+```
 
+```
+##    SUBJ VISIT  CHI_MLU Diagnosis
+## 1     2     1 1.252252        TD
+## 2     6     1 1.394737       ASD
+## 3     7     1 1.000000       ASD
+## 4     8     1 1.264151       ASD
+## 5    10     1 1.037879        TD
+## 6    11     1 1.037500        TD
+## 7    13     1 1.216867        TD
+## 8    14     1 1.087719        TD
+## 9    16     1 1.039604        TD
+## 10   17     1 1.164706        TD
+```
+
+```r
 # Have not completed all trials (could be error prone).
 data %>%
   group_by(SUBJ) %>%
   summarize(MAX_VISIT = max(VISIT)) %>%
   filter(MAX_VISIT < 6) %>%
   slice_head(n = 10)
-  
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 6 x 2
+##    SUBJ MAX_VISIT
+##   <dbl>     <dbl>
+## 1     1         1
+## 2    12         2
+## 3    24         3
+## 4    48         5
+## 5    49         2
+## 6    51         2
 ```
 
 
@@ -320,18 +408,47 @@ USING ARRANGE
 1. Sort kids to find the kid who produced the most words on the 6th visit
 2. Sort kids to find the kid who produced the least amount of words on the 1st visit.
 
-```{r}
 
+```r
 data %>% filter(VISIT == 6) %>%
   arrange(desc(CHI_MLU)) %>%
   select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
   slice_head(n = 10)
+```
 
+```
+##    SUBJ VISIT  CHI_MLU Diagnosis
+## 1    16     6 3.811404        TD
+## 2     4     6 3.710345        TD
+## 3    15     6 3.701195        TD
+## 4    54     6 3.595000        TD
+## 5    14     6 3.504950        TD
+## 6    65     6 3.441558       ASD
+## 7     3     6 3.413502       ASD
+## 8    29     6 3.364341       ASD
+## 9     5     6 3.278195       ASD
+## 10   58     6 3.243902        TD
+```
+
+```r
 data %>% filter(VISIT == 1) %>%
   arrange(CHI_MLU) %>%
   select(SUBJ, VISIT, CHI_MLU, Diagnosis) %>%
   slice_head(n = 10)
-  
+```
+
+```
+##    SUBJ VISIT   CHI_MLU Diagnosis
+## 1    62     1 0.0000000       ASD
+## 2    22     1 0.1857143       ASD
+## 3    40     1 0.4805825       ASD
+## 4    48     1 0.5584416        TD
+## 5    33     1 0.9000000       ASD
+## 6     7     1 1.0000000       ASD
+## 7    23     1 1.0000000       ASD
+## 8    32     1 1.0086207       ASD
+## 9    43     1 1.0175439       ASD
+## 10   44     1 1.0262009        TD
 ```
 
 USING SELECT
@@ -341,15 +458,30 @@ USING SELECT
 1. Make a subset of the data including only kids with ASD, mlu and word tokens
 2. What happens if you include the name of a variable multiple times in a select() call?
 
-```{r}
 
+```r
 # 1. subset ASD, MLU, Tokens. 
 data %>% filter(Diagnosis == "ASD") %>%
   select(Diagnosis, CHI_MLU, tokens_CHI) %>%
   arrange(desc(CHI_MLU)) %>%
   slice_head(n = 10)
+```
 
+```
+##    Diagnosis  CHI_MLU tokens_CHI
+## 1        ASD 4.302326        674
+## 2        ASD 4.131868        698
+## 3        ASD 4.043478        539
+## 4        ASD 3.919689       1293
+## 5        ASD 3.523810        714
+## 6        ASD 3.518072        490
+## 7        ASD 3.453039        562
+## 8        ASD 3.441558        713
+## 9        ASD 3.413502        698
+## 10       ASD 3.400000        483
+```
 
+```r
 # 2. multiple variable multiple times. (nothing).
 test <- data %>% filter(Diagnosis == "ASD") %>%
   select(Diagnosis, CHI_MLU, tokens_CHI)
@@ -358,7 +490,10 @@ test2 <- data %>% filter(Diagnosis == "ASD") %>%
   select(Diagnosis, CHI_MLU, tokens_CHI, tokens_CHI)
 
 all.equal(test, test2)
+```
 
+```
+## [1] TRUE
 ```
 
 ### Some confusion here in word-usage, not clear what is meant ###
@@ -368,15 +503,34 @@ USING MUTATE, SUMMARISE and PIPES
 2. Use the summarise function and pipes to add an column in the data set containing the mean amount of words produced by each trial across all visits. HINT: group by Child.ID 
 3. The solution to task above enables us to assess the average amount of words produced by each child. Why don't we just use these average values to describe the language production of the children? What is the advantage of keeping all the data?
 
-```{r}
 
+```r
 # mutate w. group_by. 
 data %>%
   group_by(SUBJ) %>%
   mutate(mean_CHI_MLU = mean(CHI_MLU)) %>%
   select(SUBJ, VISIT, CHI_MLU, mean_CHI_MLU) %>%
   slice_head(n = 15)
-  
+```
+
+```
+## # A tibble: 372 x 4
+## # Groups:   SUBJ [66]
+##     SUBJ VISIT CHI_MLU mean_CHI_MLU
+##    <dbl> <dbl>   <dbl>        <dbl>
+##  1     1     1   NA           NA   
+##  2     2     1    1.25         2.03
+##  3     2     2    1.01         2.03
+##  4     2     3    1.56         2.03
+##  5     2     4    2.25         2.03
+##  6     2     5    3.24         2.03
+##  7     2     6    2.87         2.03
+##  8     3     1    2.28        NA   
+##  9     3     2    3.45        NA   
+## 10     3     3    3.12        NA   
+## # … with 362 more rows
+```
+
+```r
 # is the second question not pretty much the same?
-  
 ```
