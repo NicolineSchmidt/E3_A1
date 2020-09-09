@@ -7,7 +7,29 @@ output:
     keep_md: true 
 ---
 
-### Overview: 
+### Overview 
+
+**1. How to submit assignments** \
+**2. Github (forking)** \
+**3. Comments on Assignment 1** \
+**4. Work and live-coding** \
+
+### How to submit assignments
+
+* Not in a private repository. \
+* Either write which file is the final or put this in the readme. \
+* Consider knitting to markdown (see: https://happygitwithr.com/rmd-test-drive.html) \
+
+### Github 
+
+* Sorry that I confused you last time... \
+What you should do is the following: 
+1. **Fork** repository to your group (which many of you have done for assignment 1)\
+2. **Clone** repository to your computer. 
+3. **Push & Pull** like a magnet do. 
+4. Today this is done from my github. 
+
+### Comments on Assignment 1 
 
 Today we will quickly go through parts of assignment 1. 
 This is not something we are likely to do after each 
@@ -248,7 +270,9 @@ Now we want to
 
 Again we want to use **pipes** and **Tidyverse**. \
 We also want to use **write_csv()** and not **write.csv()**. \
-In addition, remember to call your file **.csv**. 
+In addition, remember to call your file **.csv**. \
+Also, I think that 1 is male even though the text is 
+not very clear here..?
 
 ```{r, warnings = FALSE}
 
@@ -260,8 +284,8 @@ data <- data %>%
 #example solution:
 data <- data %>%
   mutate(Gender = recode(Gender,
-    "1" = "F", 
-    "2" = "M"),
+    "1" = "M", #I think 
+    "2" = "F"),
   Diagnosis = recode(Diagnosis,
     "A" = "ASD",
     "B" = "TD"))

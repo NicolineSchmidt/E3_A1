@@ -370,7 +370,40 @@ summary {
 
 
 <div id="overview" class="section level3">
-<h3>Overview:</h3>
+<h3>Overview</h3>
+<p><strong>1. How to submit assignments</strong><br />
+<strong>2. Github (forking)</strong><br />
+<strong>3. Comments on Assignment 1</strong><br />
+<strong>4. Work and live-coding</strong><br />
+</p>
+</div>
+<div id="how-to-submit-assignments" class="section level3">
+<h3>How to submit assignments</h3>
+<ul>
+<li>Not in a private repository.<br />
+</li>
+<li>Either write which file is the final or put this in the readme.<br />
+</li>
+<li>Consider knitting to markdown (see: <a href="https://happygitwithr.com/rmd-test-drive.html" class="uri">https://happygitwithr.com/rmd-test-drive.html</a>)<br />
+</li>
+</ul>
+</div>
+<div id="github" class="section level3">
+<h3>Github</h3>
+<ul>
+<li>Sorry that I confused you last time…<br />
+What you should do is the following:</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><strong>Fork</strong> repository to your group (which many of you have done for assignment 1)<br />
+</li>
+<li><strong>Clone</strong> repository to your computer.</li>
+<li><strong>Push &amp; Pull</strong> like a magnet do.</li>
+<li>Today this is done from my github.</li>
+</ol>
+</div>
+<div id="comments-on-assignment-1" class="section level3">
+<h3>Comments on Assignment 1</h3>
 <p>Today we will quickly go through parts of assignment 1. This is not something we are likely to do after each assignment (because it takes too much time for me, and from your working time in class). However, I just want to get everyone on the right track. So, what we will cover:</p>
 <ol style="list-style-type: decimal">
 <li><strong>read_csv()</strong> &amp; <strong>write_csv()</strong></li>
@@ -559,7 +592,8 @@ data &lt;- merge(new_data, merged_data, all = T)</code></pre>
 <h3>2g. Pipes and write_csv()</h3>
 <p>Again we want to use <strong>pipes</strong> and <strong>Tidyverse</strong>.<br />
 We also want to use <strong>write_csv()</strong> and not <strong>write.csv()</strong>.<br />
-In addition, remember to call your file <strong>.csv</strong>.</p>
+In addition, remember to call your file <strong>.csv</strong>.<br />
+Also, I think that 1 is male even though the text is not very clear here..?</p>
 <pre class="r"><code>#example solution 1:
 data &lt;- data %&gt;%
   mutate(SUBJ = as.numeric(as_factor(SUBJ))) %&gt;%
@@ -568,8 +602,8 @@ data &lt;- data %&gt;%
 #example solution:
 data &lt;- data %&gt;%
   mutate(Gender = recode(Gender,
-    &quot;1&quot; = &quot;F&quot;, 
-    &quot;2&quot; = &quot;M&quot;),
+    &quot;1&quot; = &quot;M&quot;, #I think 
+    &quot;2&quot; = &quot;F&quot;),
   Diagnosis = recode(Diagnosis,
     &quot;A&quot; = &quot;ASD&quot;,
     &quot;B&quot; = &quot;TD&quot;))
