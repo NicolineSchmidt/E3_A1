@@ -269,32 +269,21 @@ Now we want to
 ### 2g. Pipes and write_csv()
 
 Again we want to use **pipes** and **Tidyverse**. \
+This can all be done in one pipeline instead of 
+on different lines. That is to be preferred. \
 We also want to use **write_csv()** and not **write.csv()**. \
 In addition, remember to call your file **.csv**. \
-Also, I think that 1 is male even though the text is 
-not very clear here..?
+
 
 ```{r, warnings = FALSE}
 
-#example solution 1:
-data <- data %>%
-  mutate(SUBJ = as.numeric(as_factor(SUBJ))) %>%
-  mutate(VISIT = as.numeric(VISIT))
-
 #example solution:
 data <- data %>%
-  mutate(Gender = recode(Gender,
-    "1" = "M", #I think 
-    "2" = "F"),
-  Diagnosis = recode(Diagnosis,
-    "A" = "ASD",
-    "B" = "TD"))
+  mutate(SUBJ = as.numeric(as_factor(SUBJ)),
+         VISIT = as.numeric(VISIT),
+         Gender = if_else(Gender == "1", "M", "F")) #not clear from instr.
 
-#example solution 2 (just done the other way around here to show):
-data_test <- data %>%
-  mutate(Gender = if_else(Gender == "F", "1", "2"))
-
-#write.csv(), or perhaps write_csv()? 
+#write csv. 
 write_csv(data, "data_cleaned_draft.csv") #check that this matches. 
 
 #read it to check. 

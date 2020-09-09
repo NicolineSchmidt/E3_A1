@@ -306,32 +306,21 @@ Now we want to
 ### 2g. Pipes and write_csv()
 
 Again we want to use **pipes** and **Tidyverse**. \
+This can all be done in one pipeline instead of 
+on different lines. That is to be preferred. \
 We also want to use **write_csv()** and not **write.csv()**. \
 In addition, remember to call your file **.csv**. \
-Also, I think that 1 is male even though the text is 
-not very clear here..?
+
 
 
 ```r
-#example solution 1:
-data <- data %>%
-  mutate(SUBJ = as.numeric(as_factor(SUBJ))) %>%
-  mutate(VISIT = as.numeric(VISIT))
-
 #example solution:
 data <- data %>%
-  mutate(Gender = recode(Gender,
-    "1" = "M", #I think 
-    "2" = "F"),
-  Diagnosis = recode(Diagnosis,
-    "A" = "ASD",
-    "B" = "TD"))
+  mutate(SUBJ = as.numeric(as_factor(SUBJ)),
+         VISIT = as.numeric(VISIT),
+         Gender = if_else(Gender == "1", "M", "F")) #not clear from instr.
 
-#example solution 2 (just done the other way around here to show):
-data_test <- data %>%
-  mutate(Gender = if_else(Gender == "F", "1", "2"))
-
-#write.csv(), or perhaps write_csv()? 
+#write csv. 
 write_csv(data, "data_cleaned_draft.csv") #check that this matches. 
 
 #read it to check. 
@@ -389,16 +378,16 @@ data %>% filter(VISIT == 1) %>%
 
 ```
 ##    SUBJ VISIT  CHI_MLU Diagnosis
-## 1     2     1 1.252252        TD
-## 2     6     1 1.394737       ASD
-## 3     7     1 1.000000       ASD
-## 4     8     1 1.264151       ASD
-## 5    10     1 1.037879        TD
-## 6    11     1 1.037500        TD
-## 7    13     1 1.216867        TD
-## 8    14     1 1.087719        TD
-## 9    16     1 1.039604        TD
-## 10   17     1 1.164706        TD
+## 1     2     1 1.252252         B
+## 2     6     1 1.394737         A
+## 3     7     1 1.000000         A
+## 4     8     1 1.264151         A
+## 5    10     1 1.037879         B
+## 6    11     1 1.037500         B
+## 7    13     1 1.216867         B
+## 8    14     1 1.087719         B
+## 9    16     1 1.039604         B
+## 10   17     1 1.164706         B
 ```
 
 ```r
@@ -442,16 +431,16 @@ data %>% filter(VISIT == 6) %>%
 
 ```
 ##    SUBJ VISIT  CHI_MLU Diagnosis
-## 1    16     6 3.811404        TD
-## 2     4     6 3.710345        TD
-## 3    15     6 3.701195        TD
-## 4    54     6 3.595000        TD
-## 5    14     6 3.504950        TD
-## 6    65     6 3.441558       ASD
-## 7     3     6 3.413502       ASD
-## 8    29     6 3.364341       ASD
-## 9     5     6 3.278195       ASD
-## 10   58     6 3.243902        TD
+## 1    16     6 3.811404         B
+## 2     4     6 3.710345         B
+## 3    15     6 3.701195         B
+## 4    54     6 3.595000         B
+## 5    14     6 3.504950         B
+## 6    65     6 3.441558         A
+## 7     3     6 3.413502         A
+## 8    29     6 3.364341         A
+## 9     5     6 3.278195         A
+## 10   58     6 3.243902         B
 ```
 
 ```r
@@ -463,16 +452,16 @@ data %>% filter(VISIT == 1) %>%
 
 ```
 ##    SUBJ VISIT   CHI_MLU Diagnosis
-## 1    62     1 0.0000000       ASD
-## 2    22     1 0.1857143       ASD
-## 3    40     1 0.4805825       ASD
-## 4    48     1 0.5584416        TD
-## 5    33     1 0.9000000       ASD
-## 6     7     1 1.0000000       ASD
-## 7    23     1 1.0000000       ASD
-## 8    32     1 1.0086207       ASD
-## 9    43     1 1.0175439       ASD
-## 10   44     1 1.0262009        TD
+## 1    62     1 0.0000000         A
+## 2    22     1 0.1857143         A
+## 3    40     1 0.4805825         A
+## 4    48     1 0.5584416         B
+## 5    33     1 0.9000000         A
+## 6     7     1 1.0000000         A
+## 7    23     1 1.0000000         A
+## 8    32     1 1.0086207         A
+## 9    43     1 1.0175439         A
+## 10   44     1 1.0262009         B
 ```
 
 USING SELECT
@@ -492,17 +481,8 @@ data %>% filter(Diagnosis == "ASD") %>%
 ```
 
 ```
-##    Diagnosis  CHI_MLU tokens_CHI
-## 1        ASD 4.302326        674
-## 2        ASD 4.131868        698
-## 3        ASD 4.043478        539
-## 4        ASD 3.919689       1293
-## 5        ASD 3.523810        714
-## 6        ASD 3.518072        490
-## 7        ASD 3.453039        562
-## 8        ASD 3.441558        713
-## 9        ASD 3.413502        698
-## 10       ASD 3.400000        483
+## [1] Diagnosis  CHI_MLU    tokens_CHI
+## <0 rows> (or 0-length row.names)
 ```
 
 ```r
