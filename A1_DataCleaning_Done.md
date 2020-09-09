@@ -9,15 +9,17 @@ output:
 
 ### Overview 
 
+**0. Please fill out the blackboard name thing (padlet)** \
 **1. How to submit assignments** \
 **2. Github (forking)** \
 **3. Comments on Assignment 1** \
-**4. Work and live-coding** \
+**4. A few comments about next assignment** \
+**5. Work and live-coding** \
 
 ### How to submit assignments
 
 * Not in a private repository. \
-* Either write which file is the final or put this in the readme. \
+* Either write which file is the final or put this information in the readme. \
 * Consider knitting to markdown (see: https://happygitwithr.com/rmd-test-drive.html) \
 
 ### Github 
@@ -29,13 +31,44 @@ What you should do is the following:
 3. **Push & Pull** like a magnet do. 
 4. Today this is done from my github. 
 
+### Assignment 2 
+
+1. For p-values you can use the package lmerTest (summary function). 
+
+
+2. To plot fitted values (predicted by model) 
+you could look into the package \
+**broom.mixed**. I am not an expert (I found it yesterday) \
+but it seems promising to me. \
+Another option seems to be **sjPlot**. \
+Otherwise it is possible to obtain predicted \
+(fitted values) using **predict()**. \
+As I have not really used any of these before \
+I encourage you to google and try your hand. \
+Otherwise we will try to find solutions together. 
+
+
+3. To obtain **marginal** and **conditional** \
+R-squared values I would encourage you to look into \
+the function **r.squaredGLMM** from the package **MuMIn**. \
+Marginal and conditional R-squared are mentioned \
+in the readings for today, and are interesting because \
+they tell us about how much variance is explained \
+by fixed effects (marginal) and by with random effects (conditional) 
+
+
+4. Remember that you can always get in touch with me, \
+either on **facebook** or on **victormoeller@gmail.com** 
+or whatever.
+
 ### Comments on Assignment 1 
 
-Today we will quickly go through parts of assignment 1. 
-This is not something we are likely to do after each 
-assignment (because it takes too much time for me, and 
-from your working time in class). However, I just want
-to get everyone on the right track. So, what we will cover: 
+Today we will quickly go through parts of the first assignment. \
+
+This is not something we are likely to do after each \
+assignment (because it takes too much time for me, and \
+from your working time in class). However, I just want \
+to get everyone on the right track. So, what we will cover: \
 
 1. **read_csv()** & **write_csv()**
 2. **Tidyverse** & **readability**

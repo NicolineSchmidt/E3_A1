@@ -371,10 +371,12 @@ summary {
 
 <div id="overview" class="section level3">
 <h3>Overview</h3>
-<p><strong>1. How to submit assignments</strong><br />
+<p><strong>0. Please fill out the blackboard name thing (padlet)</strong><br />
+<strong>1. How to submit assignments</strong><br />
 <strong>2. Github (forking)</strong><br />
 <strong>3. Comments on Assignment 1</strong><br />
-<strong>4. Work and live-coding</strong><br />
+<strong>4. A few comments about next assignment</strong><br />
+<strong>5. Work and live-coding</strong><br />
 </p>
 </div>
 <div id="how-to-submit-assignments" class="section level3">
@@ -382,7 +384,7 @@ summary {
 <ul>
 <li>Not in a private repository.<br />
 </li>
-<li>Either write which file is the final or put this in the readme.<br />
+<li>Either write which file is the final or put this information in the readme.<br />
 </li>
 <li>Consider knitting to markdown (see: <a href="https://happygitwithr.com/rmd-test-drive.html" class="uri">https://happygitwithr.com/rmd-test-drive.html</a>)<br />
 </li>
@@ -402,9 +404,39 @@ What you should do is the following:</li>
 <li>Today this is done from my github.</li>
 </ol>
 </div>
+<div id="assignment-2" class="section level3">
+<h3>Assignment 2</h3>
+<ol style="list-style-type: decimal">
+<li><p>For p-values you can use the package lmerTest (summary function).</p></li>
+<li><p>To plot fitted values (predicted by model) you could look into the package<br />
+<strong>broom.mixed</strong>. I am not an expert (I found it yesterday)<br />
+but it seems promising to me.<br />
+Another option seems to be <strong>sjPlot</strong>.<br />
+Otherwise it is possible to obtain predicted<br />
+(fitted values) using <strong>predict()</strong>.<br />
+As I have not really used any of these before<br />
+I encourage you to google and try your hand.<br />
+Otherwise we will try to find solutions together.</p></li>
+<li><p>To obtain <strong>marginal</strong> and <strong>conditional</strong><br />
+R-squared values I would encourage you to look into<br />
+the function <strong>r.squaredGLMM</strong> from the package <strong>MuMIn</strong>.<br />
+Marginal and conditional R-squared are mentioned<br />
+in the readings for today, and are interesting because<br />
+they tell us about how much variance is explained<br />
+by fixed effects (marginal) and by with random effects (conditional)</p></li>
+<li><p>Remember that you can always get in touch with me,<br />
+either on <strong>facebook</strong> or on <strong><a href="mailto:victormoeller@gmail.com" class="email">victormoeller@gmail.com</a></strong> or whatever.</p></li>
+</ol>
+</div>
 <div id="comments-on-assignment-1" class="section level3">
 <h3>Comments on Assignment 1</h3>
-<p>Today we will quickly go through parts of assignment 1. This is not something we are likely to do after each assignment (because it takes too much time for me, and from your working time in class). However, I just want to get everyone on the right track. So, what we will cover:</p>
+<p>Today we will quickly go through parts of the first assignment.<br />
+</p>
+<p>This is not something we are likely to do after each<br />
+assignment (because it takes too much time for me, and<br />
+from your working time in class). However, I just want<br />
+to get everyone on the right track. So, what we will cover:<br />
+</p>
 <ol style="list-style-type: decimal">
 <li><strong>read_csv()</strong> &amp; <strong>write_csv()</strong></li>
 <li><strong>Tidyverse</strong> &amp; <strong>readability</strong></li>
