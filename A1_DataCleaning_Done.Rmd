@@ -33,19 +33,15 @@ What you should do is the following:
 
 ### Assignment 2 
 
-1. For p-values you can use the package lmerTest (summary function). 
+1. For p-values you can use the package lmerTest (summary function). \
+That is, if you need them. This is also mentioned in the readings for today.
 
 
-2. To plot fitted values (predicted by model) 
-you could look into the package \
-**broom.mixed**. I am not an expert (I found it yesterday) \
-but it seems promising to me. \
-Another option seems to be **sjPlot**. \
-Otherwise it is possible to obtain predicted \
-(fitted values) using **predict()**. \
-As I have not really used any of these before \
-I encourage you to google and try your hand. \
-Otherwise we will try to find solutions together. 
+2. Fitted values against actual values: \
+To plot fitted values (predicted by model) \
+you could look into the package **broom.mixed**. \
+Another option seems to be **sjPlot** or using **predict()**. \
+These are just suggestions, and I suggest you to try your own hand. 
 
 
 3. To obtain **marginal** and **conditional** \
@@ -54,7 +50,7 @@ the function **r.squaredGLMM** from the package **MuMIn**. \
 Marginal and conditional R-squared are mentioned \
 in the readings for today, and are interesting because \
 they tell us about how much variance is explained \
-by fixed effects (marginal) and by with random effects (conditional) 
+by fixed effects (marginal) and by with random effects (conditional).
 
 
 4. Remember that you can always get in touch with me, \
