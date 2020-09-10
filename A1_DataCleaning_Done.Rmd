@@ -67,7 +67,7 @@ from your working time in class). However, I just want \
 to get everyone on the right track. So, what we will cover: \
 
 1. **read_csv()** & **write_csv()**
-2. **Tidyverse** & **readability**
+2. **Tidyverse**, **readability** & **scaleability**
 3. **pipes** 
 4. **functions**
 
